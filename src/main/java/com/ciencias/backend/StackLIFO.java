@@ -6,7 +6,7 @@ import javafx.collections.ObservableList;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StackLIFO<T> {
+public class StackLIFO<T> implements Items<T> {
     final private List<T> nodes = new ArrayList<>();
     final private ObservableList<T> items = FXCollections.observableList(nodes);
 

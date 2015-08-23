@@ -45,7 +45,8 @@ public class App extends Application {
             @Override
             public void handle(ActionEvent actionEvent) {
                 String text = textoNodo.getText();
-                System.out.println(text);
+                textoNodo.setText("");
+                textoNodo.requestFocus();
                 queueFIFO.add(text);
             }
         });
@@ -54,6 +55,7 @@ public class App extends Application {
             @Override
             public void handle(ActionEvent actionEvent) {
                 queueFIFO.remove();
+                textoNodo.requestFocus();
             }
         });
         addList(grid);

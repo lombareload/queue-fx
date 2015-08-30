@@ -1,6 +1,9 @@
 package com.ciencias;
 
+import com.ciencias.backend.ContainsBehaviour;
+import com.ciencias.backend.Items;
 import com.ciencias.backend.QueueFIFO;
+import com.ciencias.backend.SearchBehaviour;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -18,16 +21,18 @@ import javafx.stage.Stage;
 
 public class App extends Application {
     ListView<String> listView;
-    QueueFIFO<String> queueFIFO = new QueueFIFO<>();
+    Items<String> queueFIFO = new QueueFIFO<>();
+    SearchBehaviour searchBehaviour = new ContainsBehaviour();
     TextField textoNodo;
 
     @Override
     public void start(Stage stage) throws Exception {
         Group root = initializeRoot();
 
-        Scene scene = new Scene(root, 400, 300);
+        Scene scene = new Scene(root, 450, 400);
         stage.setScene(scene);
         stage.show();
+        textoNodo.requestFocus();
     }
 
     private Group initializeRoot(){
@@ -40,33 +45,52 @@ public class App extends Application {
     private void addControls(Group root){
         GridPane grid = new GridPane();
         textoNodo = new TextField("1");
+        Button searchButton = new Button("Search");
+        searchButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                String text = textoNodo.getText();
+                int foundIndex = queueFIFO.search(searchBehaviour, text);
+                System.out.println("foundIndex: " + foundIndex);
+                listView.requestFocus();
+                listView.getFocusModel().focus(foundIndex);
+            }
+        });
         Button addButton = new Button("Add");
-        addButton.setOnAction(new EventHandler<ActionEvent>() {
+        EventHandler<ActionEvent> addEventHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 String text = textoNodo.getText();
                 textoNodo.setText("");
-                textoNodo.requestFocus();
                 queueFIFO.add(text);
+                textoNodo.requestFocus();
             }
-        });
+        };
+        addButton.setOnAction(addEventHandler);
         Button deleteButton = new Button("Delete");
         deleteButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                queueFIFO.remove();
+                int focusedIndex = listView.getFocusModel().getFocusedIndex();
+                if (focusedIndex > -1) {
+                    queueFIFO.remove(focusedIndex);
+                } else {
+
+                }
                 textoNodo.requestFocus();
             }
         });
+        textoNodo.setOnAction(addEventHandler);
         addList(grid);
         textoNodo.setMinHeight(20);
         textoNodo.setAlignment(Pos.CENTER);
         VBox vBox = new VBox();
         HBox hBox = new HBox();
-        vBox.getChildren().add(textoNodo);
         hBox.setAlignment(Pos.CENTER_RIGHT);
+        hBox.getChildren().add(searchButton);
         hBox.getChildren().add(addButton);
         hBox.getChildren().add(deleteButton);
+        vBox.getChildren().add(textoNodo);
         vBox.getChildren().add(hBox);
 
         vBox.setAlignment(Pos.CENTER_RIGHT);
